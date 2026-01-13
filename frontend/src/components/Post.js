@@ -104,7 +104,23 @@ export default function Post({ post, user, onPostUpdate }) {
 }
 
 function getTimeAgo(date) {
+  // Handle both Date objects and strings
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  
+  // Return "just now" if date is invalid or in the future
+  if (isNaN(date.getTime())) {
+    return 'just now';
+  }
+  
   const seconds = Math.floor((new Date() - date) / 1000);
+  
+  // If negative (future date), return "just now"
+  if (seconds < 0) {
+    return 'just now';
+  }
+  
   let interval = seconds / 31536000;
   if (interval > 1) return Math.floor(interval) + 'y';
   interval = seconds / 2592000;

@@ -8,6 +8,19 @@ const router = express.Router();
 const MAX_POST_LENGTH = 280;
 const MAX_REPLY_LENGTH = 280;
 
+// Convert SQLite datetime string to ISO format
+// SQLite stores UTC datetime in format "2026-01-13 18:29:18"
+// We need to append Z to indicate UTC
+function toISOString(sqliteDatetime) {
+  if (!sqliteDatetime) return new Date().toISOString();
+  // SQLite format: "2026-01-13 18:29:18" -> ISO: "2026-01-13T18:29:18.000Z"
+  if (typeof sqliteDatetime === 'string' && !sqliteDatetime.includes('T')) {
+    // Replace space with T and append .000Z for UTC
+    return sqliteDatetime.replace(' ', 'T') + '.000Z';
+  }
+  return sqliteDatetime;
+}
+
 // Get feed (all posts chronologically)
 router.get('/feed', (req, res) => {
   db.all(
@@ -24,8 +37,13 @@ router.get('/feed', (req, res) => {
         logger.error('Failed to fetch feed', err.message);
         return res.status(500).json({ error: 'Failed to fetch feed' });
       }
+      // Convert all timestamps to ISO format
+      const formattedPosts = posts.map(post => ({
+        ...post,
+        created_at: toISOString(post.created_at)
+      }));
       logger.debug(`Feed fetched: ${posts ? posts.length : 0} posts`);
-      res.json(posts);
+      res.json(formattedPosts);
     }
   );
 });
@@ -84,7 +102,16 @@ router.get('/:postId', (req, res) => {
           if (err) {
             return res.status(500).json({ error: 'Failed to fetch replies' });
           }
-          res.json({ ...post, replies });
+          // Convert all timestamps to ISO format
+          const formattedPost = {
+            ...post,
+            created_at: toISOString(post.created_at)
+          };
+          const formattedReplies = replies.map(reply => ({
+            ...reply,
+            created_at: toISOString(reply.created_at)
+          }));
+          res.json({ ...formattedPost, replies: formattedReplies });
         }
       );
     }
