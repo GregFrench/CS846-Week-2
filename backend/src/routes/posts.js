@@ -71,7 +71,26 @@ router.post('/', authenticateToken, (req, res) => {
         return res.status(500).json({ error: 'Failed to create post' });
       }
       logger.info(`✓ Post created by user ${req.user.id} (ID: ${this.lastID})`);
-      res.status(201).json({ id: this.lastID, user_id: req.user.id, content, created_at: new Date() });
+      
+      // Fetch the username to include in response
+      db.get(
+        'SELECT username FROM users WHERE id = ?',
+        [req.user.id],
+        (err, user) => {
+          if (err || !user) {
+            return res.status(500).json({ error: 'Failed to fetch user' });
+          }
+          res.status(201).json({
+            id: this.lastID,
+            user_id: req.user.id,
+            username: user.username,
+            content,
+            created_at: new Date(),
+            likes_count: 0,
+            replies_count: 0
+          });
+        }
+      );
     }
   );
 });
@@ -165,13 +184,25 @@ router.post('/:postId/reply', authenticateToken, (req, res) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to create reply' });
       }
-      res.status(201).json({
-        id: this.lastID,
-        post_id: req.params.postId,
-        user_id: req.user.id,
-        content,
-        created_at: new Date()
-      });
+      
+      // Fetch the username to include in response
+      db.get(
+        'SELECT username FROM users WHERE id = ?',
+        [req.user.id],
+        (err, user) => {
+          if (err || !user) {
+            return res.status(500).json({ error: 'Failed to fetch user' });
+          }
+          res.status(201).json({
+            id: this.lastID,
+            post_id: req.params.postId,
+            user_id: req.user.id,
+            username: user.username,
+            content,
+            created_at: new Date()
+          });
+        }
+      );
     }
   );
 });
