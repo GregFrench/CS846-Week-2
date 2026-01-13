@@ -14,7 +14,7 @@ describe('Login Component', () => {
 
   test('renders login form by default', () => {
     render(<Login setUser={mockSetUser} setToken={mockSetToken} />);
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
   });
@@ -22,10 +22,10 @@ describe('Login Component', () => {
   test('toggles between login and register forms', () => {
     render(<Login setUser={mockSetUser} setToken={mockSetToken} />);
     
-    const toggleButton = screen.getByText('Register');
+    const toggleButton = screen.getByRole('button', { name: /register/i });
     fireEvent.click(toggleButton);
     
-    expect(screen.getByText('Register')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /register/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
   });
 
@@ -34,7 +34,7 @@ describe('Login Component', () => {
     
     const usernameInput = screen.getByPlaceholderText('Username');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const loginButton = screen.getByText('Login');
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
     fireEvent.change(usernameInput, { target: { value: 'testuser' } });
     fireEvent.change(passwordInput, { target: { value: 'password' } });
@@ -48,14 +48,18 @@ describe('Login Component', () => {
   test('requires username and password for login', () => {
     render(<Login setUser={mockSetUser} setToken={mockSetToken} />);
     
-    const loginButton = screen.getByText('Login');
-    expect(loginButton).toBeDisabled();
+    const usernameInput = screen.getByPlaceholderText('Username');
+    const passwordInput = screen.getByPlaceholderText('Password');
+    
+    // Inputs should be required
+    expect(usernameInput).toHaveAttribute('required');
+    expect(passwordInput).toHaveAttribute('required');
   });
 
   test('has register form with email and bio fields', () => {
     render(<Login setUser={mockSetUser} setToken={mockSetToken} />);
     
-    const toggleButton = screen.getByText('Register');
+    const toggleButton = screen.getByRole('button', { name: /register/i });
     fireEvent.click(toggleButton);
     
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();

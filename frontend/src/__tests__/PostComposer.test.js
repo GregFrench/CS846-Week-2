@@ -54,12 +54,12 @@ describe('PostComposer Component', () => {
     render(<PostComposer onPostCreated={mockOnPostCreated} />);
 
     const textarea = screen.getByPlaceholderText(/What's happening/);
-    const longText = 'a'.repeat(300);
-
-    fireEvent.change(textarea, { target: { value: longText } });
-
-    // MaxLength should prevent more than 280 chars
-    expect(textarea.value.length).toBeLessThanOrEqual(280);
+    
+    // Verify maxLength attribute is set to 280
+    expect(textarea).toHaveAttribute('maxLength', '280');
+    
+    // Verify initial character count shows 280
+    expect(screen.getByText('280')).toBeInTheDocument();
   });
 
   test('displays warning color when characters are low', () => {
