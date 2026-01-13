@@ -83,7 +83,7 @@ cd backend
 npm install
 npm start
 ```
-Backend runs on `http://localhost:5000`
+Backend runs on `http://localhost:3000`
 
 ### Step 2: Install Frontend (New Terminal)
 ```bash

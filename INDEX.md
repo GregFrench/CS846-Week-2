@@ -170,7 +170,7 @@ bash setup.sh              # macOS/Linux
 setup.bat                  # Windows
 
 # Start Backend
-cd backend && npm start    # Runs on port 5000
+cd backend && npm start    # Runs on port 3000
 
 # Start Frontend
 cd frontend && npm start   # Runs on port 3000
@@ -204,7 +204,7 @@ cd frontend && npm start   # Runs on port 3000
 
 After installation, verify everything works:
 
-- [ ] Backend runs on `http://localhost:5000`
+- [ ] Backend runs on `http://localhost:3000`
 - [ ] Frontend opens on `http://localhost:3000`
 - [ ] Can register a new account
 - [ ] Can login with credentials

@@ -363,7 +363,7 @@ week2/
 
 ### Configuration
 - JWT secret can be changed in `backend/.env`
-- Port 5000 (backend) and 3000 (frontend) configurable
+- Port 3000 (backend) and 3000 (frontend) configurable
 - SQLite database auto-created on first run
 
 ### No Additional Setup Needed

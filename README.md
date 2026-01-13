@@ -40,7 +40,7 @@ cd frontend && npm install && cd ..
 
 ### Running
 ```bash
-# Terminal 1: Backend (port 5000)
+# Terminal 1: Backend (port 3000)
 cd backend && npm start
 
 # Terminal 2: Frontend (port 3000)
@@ -152,7 +152,7 @@ PORT=3001 npm start
 rm backend/microblog.db && npm start
 
 # Frontend can't connect?
-Ensure backend runs on port 5000
+Ensure backend runs on port 3000
 ```
 
 ## 📈 Ready for

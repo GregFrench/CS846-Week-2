@@ -22,7 +22,7 @@ cd ..
 cd backend
 npm start
 ```
-Expected output: `Server running on port 5000`
+Expected output: `Server running on port 3000`
 
 ### Terminal 2: Start Frontend
 ```bash
@@ -70,7 +70,7 @@ npm start
 ```
 
 **CORS errors?**
-- Make sure backend is running on port 5000
+- Make sure backend is running on port 3000
 - Make sure frontend proxy is set in package.json
 
 ## File Structure Quick Reference

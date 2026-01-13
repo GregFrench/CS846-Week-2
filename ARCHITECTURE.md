@@ -25,7 +25,7 @@
 ┌─────────────────────────────────────────────────────────────┐
 │              Backend Server (Node.js/Express)                │
 │  ┌──────────────────────────────────────────────────────┐   │
-│  │ Port 5000                                            │   │
+│  │ Port 3000                                            │   │
 │  │ ├─ server.js (Express setup)                        │   │
 │  │ ├─ middleware/auth.js (JWT verification)            │   │
 │  │ └─ routes/                                           │   │

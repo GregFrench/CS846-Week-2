@@ -131,7 +131,7 @@ cd ..
 
 ### Start the Application
 ```bash
-# Terminal 1: Start backend (runs on port 5000)
+# Terminal 1: Start backend (runs on port 3000)
 cd backend
 npm start
 
