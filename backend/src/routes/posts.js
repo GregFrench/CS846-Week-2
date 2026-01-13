@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { authenticateToken } = require('../middleware/auth');
+const { logger } = require('../logger');
 
 const router = express.Router();
 
@@ -20,8 +21,10 @@ router.get('/feed', (req, res) => {
     [],
     (err, posts) => {
       if (err) {
+        logger.error('Failed to fetch feed', err.message);
         return res.status(500).json({ error: 'Failed to fetch feed' });
       }
+      logger.debug(`Feed fetched: ${posts ? posts.length : 0} posts`);
       res.json(posts);
     }
   );
@@ -32,10 +35,12 @@ router.post('/', authenticateToken, (req, res) => {
   const { content } = req.body;
 
   if (!content || content.trim().length === 0) {
+    logger.warn(`Empty post attempted by user ${req.user.id}`);
     return res.status(400).json({ error: 'Post content cannot be empty' });
   }
 
   if (content.length > MAX_POST_LENGTH) {
+    logger.warn(`Post too long (${content.length} chars) by user ${req.user.id}`);
     return res.status(400).json({ error: `Post must be ${MAX_POST_LENGTH} characters or less` });
   }
 
@@ -44,8 +49,10 @@ router.post('/', authenticateToken, (req, res) => {
     [req.user.id, content],
     function (err) {
       if (err) {
+        logger.error(`Failed to create post for user ${req.user.id}`, err.message);
         return res.status(500).json({ error: 'Failed to create post' });
       }
+      logger.info(`✓ Post created by user ${req.user.id} (ID: ${this.lastID})`);
       res.status(201).json({ id: this.lastID, user_id: req.user.id, content, created_at: new Date() });
     }
   );

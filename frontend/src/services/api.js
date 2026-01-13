@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logger, logApiCall } from './logger';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -12,8 +13,27 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  logger.debug(`API Request: ${config.method.toUpperCase()} ${config.url}`);
   return config;
 });
+
+// Log responses
+api.interceptors.response.use(
+  (response) => {
+    const { status, config, data } = response;
+    logger.info(`✓ ${config.method.toUpperCase()} ${config.url} ${status}`);
+    return response;
+  },
+  (error) => {
+    const { response, config } = error;
+    if (response) {
+      logger.error(`❌ ${config.method.toUpperCase()} ${config.url} ${response.status}`, response.data);
+    } else {
+      logger.error('Network error', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authService = {
   register: (username, email, password, bio) =>

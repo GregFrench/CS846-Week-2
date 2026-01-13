@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { authService } from '../services/api';
+import { logger } from '../services/logger';
 
 export default function Login({ setUser, setToken }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,18 +19,23 @@ export default function Login({ setUser, setToken }) {
     try {
       let response;
       if (isLogin) {
+        logger.info(`Attempting login for user: ${username}`);
         response = await authService.login(username, password);
       } else {
+        logger.info(`Attempting registration for user: ${username}`);
         response = await authService.register(username, email, password, bio);
       }
 
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      logger.info(`✓ Authentication successful for ${user.username}`);
       setToken(token);
       setUser(user);
     } catch (err) {
-      setError(err.response?.data?.error || 'An error occurred');
+      const errorMsg = err.response?.data?.error || 'An error occurred';
+      logger.error(`Authentication failed: ${errorMsg}`);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
