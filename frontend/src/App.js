@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 import Login from './components/Login';
 import Feed from './pages/Feed';
 import UserProfile from './pages/UserProfile';
-import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
