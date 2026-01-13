@@ -7,6 +7,9 @@ export default function Post({ post, user, onPostUpdate }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [repliesLoading, setRepliesLoading] = useState(false);
 
   const handleLike = async () => {
     try {
@@ -32,12 +35,31 @@ export default function Post({ post, user, onPostUpdate }) {
     try {
       const response = await postsService.replyToPost(post.id, replyContent);
       setReplyContent('');
-      setShowReplyForm(false);
+      // Add new reply to replies list
+      setReplies([...replies, response.data]);
       onPostUpdate?.();
     } catch (err) {
       console.error('Failed to reply:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReplies = async () => {
+    if (showReplies) {
+      setShowReplies(false);
+      return;
+    }
+
+    setRepliesLoading(true);
+    try {
+      const response = await postsService.getPost(post.id);
+      setReplies(response.data.replies || []);
+      setShowReplies(true);
+    } catch (err) {
+      console.error('Failed to fetch replies:', err);
+    } finally {
+      setRepliesLoading(false);
     }
   };
 
@@ -66,12 +88,37 @@ export default function Post({ post, user, onPostUpdate }) {
           {liked ? '❤️' : '🤍'} Like
         </button>
         <button
+          onClick={fetchReplies}
+          style={styles.actionButton}
+        >
+          💬 {showReplies ? 'Hide' : 'View'} Replies ({post.replies_count || 0})
+        </button>
+        <button
           onClick={() => setShowReplyForm(!showReplyForm)}
           style={styles.actionButton}
         >
-          💬 Reply
+          ➕ Reply
         </button>
       </div>
+      {showReplies && (
+        <div style={styles.repliesSection}>
+          {repliesLoading ? (
+            <div style={styles.repliesLoading}>Loading replies...</div>
+          ) : replies.length === 0 ? (
+            <div style={styles.noReplies}>No replies yet</div>
+          ) : (
+            replies.map((reply) => (
+              <div key={reply.id} style={styles.reply}>
+                <div style={styles.replyHeader}>
+                  <span style={styles.replyUsername}>{reply.username}</span>
+                  <span style={styles.replyTime}>{getTimeAgo(new Date(reply.created_at))}</span>
+                </div>
+                <p style={styles.replyContent}>{reply.content}</p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
       {showReplyForm && (
         <form onSubmit={handleReply} style={styles.replyForm}>
           <textarea
@@ -210,5 +257,50 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     marginRight: '10px',
+  },
+  repliesSection: {
+    marginTop: '15px',
+    padding: '15px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '4px',
+    borderLeft: '3px solid #1DA1F2',
+  },
+  repliesLoading: {
+    color: '#666',
+    fontSize: '14px',
+    textAlign: 'center',
+    padding: '10px',
+  },
+  noReplies: {
+    color: '#999',
+    fontSize: '14px',
+    textAlign: 'center',
+    padding: '10px',
+    fontStyle: 'italic',
+  },
+  reply: {
+    paddingBottom: '15px',
+    marginBottom: '15px',
+    borderBottom: '1px solid #e1e8ed',
+  },
+  replyHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '5px',
+    fontSize: '14px',
+  },
+  replyUsername: {
+    fontWeight: 'bold',
+    color: '#1DA1F2',
+  },
+  replyTime: {
+    color: '#999',
+    fontSize: '12px',
+  },
+  replyContent: {
+    margin: '5px 0',
+    fontSize: '14px',
+    lineHeight: '1.5',
+    color: '#333',
   },
 };
